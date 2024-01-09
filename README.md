@@ -35,5 +35,10 @@ Thank you for visiting my portfolio. I look forward to connecting with you!
 Happy Coding! 🚀
 
 
+
 ![home](https://github.com/padalasuraj/Portfolio_website/assets/108484886/43ca9136-8daf-4878-9919-c157ebc2e247)
+
+
+
+![projects](https://github.com/padalasuraj/Portfolio_website/assets/108484886/2199a7ab-a824-48ed-8790-678462cd36d9)
 
