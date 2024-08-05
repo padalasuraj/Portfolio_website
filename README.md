@@ -37,8 +37,8 @@ Communication is key, and I pride myself on:
 
 Explore my portfolio to find examples of my work:
 
-- [Hometown Flavours](https://github.com/padalasuraj/Hometown_flavours) ![GitHub Repo](https://img.shields.io/github/stars/padalasuraj/Hometown_flavours?style=social)
-- [Personal GitHub Profile](https://github.com/padalasuraj/padalasuraj) ![GitHub Repo](https://img.shields.io/github/stars/padalasuraj/padalasuraj?style=social)
+- [Hometown Flavours](https://github.com/padalasuraj/Hometown_flavours)    
+- [Personal GitHub Profile](https://github.com/padalasuraj/padalasuraj)   
 
 ## Contact Information 📬
 
