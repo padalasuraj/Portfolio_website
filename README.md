@@ -24,7 +24,13 @@ With a solid foundation in marketing and management, I have successfully:
 - Managed projects from inception to completion, ensuring efficiency and excellence. 📅
 - Excelled in team collaboration and leadership. 🤝
 - Contributed to startup initiatives. 🚀
+## Portfolio Images 🖼️
 
+![Home](assets/styles/img/11.png)
+
+![Projects](assets/styles/img/12.png)
+
+![Another Image](assets/styles/img/13.png)
 ## Communication 🗣️
 
 Communication is key, and I pride myself on:
@@ -52,8 +58,5 @@ Thank you for visiting my portfolio. I look forward to connecting with you!
 
 Happy Coding! 🚀
 
-## Portfolio Images 🖼️
 
-![Home](https://github.com/padalasuraj/Portfolio_website/assets/108484886/43ca9136-8daf-4878-9919-c157ebc2e247)
 
-![Projects](https://github.com/padalasuraj/Portfolio_website/assets/108484886/2199a7ab-a824-48ed-8790-678462cd36d9)
