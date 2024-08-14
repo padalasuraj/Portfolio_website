@@ -56,3 +56,32 @@ sr.reveal(".home__img, .about__subtitle, .about__text, .skills__img", {
 });
 sr.reveal(".home__social-icon", { interval: 200 });
 sr.reveal(".skills__data, .work__img, .contact__input", { interval: 200 });
+
+/* form submission */
+function handleFormSubmit(event) {
+  event.preventDefault(); // Prevent default form submission
+
+  const form = event.target;
+  const formData = new FormData(form);
+
+  // You can log the form data or send it to another service if needed
+  console.log("Form submitted:", Object.fromEntries(formData));
+
+  // Example of custom handling: send form data using Fetch API
+  fetch("/", {
+    method: "POST",
+    body: new URLSearchParams(formData),
+  })
+    .then((response) => {
+      if (response.ok) {
+        alert("Form submitted successfully!");
+        form.reset(); // Reset the form after successful submission
+      } else {
+        alert("There was a problem with your submission. Please try again.");
+      }
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      alert("There was a problem with your submission. Please try again.");
+    });
+}

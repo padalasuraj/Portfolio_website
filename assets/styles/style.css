@@ -147,81 +147,6 @@ img {
   padding-bottom: 2rem;
 }
 
-/* Splash Screen Styles */
-.splash-screen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: black;
-  color: #0f0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  transition: opacity 1s ease-out;
-  opacity: 1;
-  visibility: visible;
-}
-
-.splash-screen.hidden {
-  opacity: 0;
-  visibility: hidden;
-}
-
-#welcome-message {
-  font-size: 3rem;
-  color: #0f0;
-  text-shadow: 0 0 15px #00ff00, 0 0 25px #00ff00, 0 0 35px #00ff00;
-  animation: neon 1.5s ease-in-out infinite alternate;
-  margin: 0;
-}
-
-@keyframes neon {
-  from {
-    text-shadow: 0 0 15px #00ff00;
-  }
-  to {
-    text-shadow: 0 0 25px #00ff00, 0 0 35px #00ff00;
-  }
-}
-
-.matrix {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -1;
-  color: #0f0;
-  background: rgba(0, 0, 0, 0.9);
-}
-
-.warning {
-  font-size: 1.2rem;
-  color: red;
-  background-color: rgba(0, 0, 0, 0.7);
-  padding: 10px;
-  border-radius: 5px;
-  border: 2px solid red;
-  text-align: center;
-  margin-top: 1.5rem;
-  animation: blink 1s infinite;
-}
-
-@keyframes blink {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
 /*===== LAYOUT =====*/
 .bd-grid {
   max-width: 1024px;
@@ -241,6 +166,7 @@ img {
 }
 
 /*===== NAV =====*/
+
 .nav {
   height: var(--header-height);
   display: flex;
@@ -512,7 +438,169 @@ img {
 }
 
 .button:hover {
-  box-shadow: 0px 10px 36px rgba(0, 0, 0, 0.15);
+  box-shadow: 0px 10px 36px rgba(253, 253, 253, 0.15);
+}
+
+/* skills */
+
+/*  2 */
+.skills__card-link2 {
+  text-decoration: none; /* Remove default underline from the link */
+  color: inherit; /* Inherit text color from the parent element */
+}
+
+.skills__card-link2:hover .skills__card-description {
+  text-decoration: underline; /* Optional: underline on hover */
+  color: var(--link-color); /* Optional: change color on hover */
+}
+.skills__card-link2 {
+  display: inline-block;
+  padding: 0.5rem 1rem; /* Consistent padding */
+  font-size: 0.875rem; /* Consistent font size */
+  color: #00dbde; /* Updated color */
+  background-color: #000;
+  border-radius: 0.5rem;
+  border: 2px solid #00dbde; /* Updated border color */
+  text-decoration: none;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.skills__card-link2:hover {
+  background-color: #00dbde; /* Updated hover background color */
+  color: #000; /* Hover text color */
+}
+
+.skills__card-link1 {
+  text-decoration: none; /* Remove default underline from the link */
+  color: inherit; /* Inherit text color from the parent element */
+}
+
+.skills__card-link1:hover .skills__card-description {
+  text-decoration: underline; /* Optional: underline on hover */
+  color: var(--link-color); /* Optional: change color on hover */
+}
+
+.skills__card {
+  position: relative;
+  width: 100%; /* Ensures cards are responsive */
+  max-width: 320px; /* Size of the card */
+  height: 360px; /* Size of the card */
+  background-color: #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 16px; /* Padding for content */
+  gap: 8px; /* Decreased gap between elements inside the card */
+  border-radius: 12px; /* Rounded corners */
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.skills__card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 100%; /* Full width of the card */
+  height: 100%; /* Full height of the card */
+  border-radius: 12px; /* Match rounded corners with the card */
+  background: linear-gradient(-45deg, #e81cff 0%, #40c9ff 100%);
+  z-index: -10;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.skills__card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 100%; /* Full width of the card */
+  height: 100%; /* Full height of the card */
+  background: linear-gradient(-45deg, #fc00ff 0%, #00dbde 100%);
+  transform: translate3d(0, 0, 0) scale(0.95);
+  filter: blur(15px); /* Adjusted blur */
+  z-index: -1;
+}
+
+.skills__card:hover::after {
+  filter: blur(25px); /* Increased blur on hover */
+}
+
+.skills__card:hover::before {
+  transform: rotate(-90deg) scaleX(1.34) scaleY(0.77);
+}
+
+.skills__card-title {
+  font-size: 1.25rem; /* Consistent font size */
+  font-weight: 700;
+  text-transform: capitalize;
+  margin-bottom: 0.5rem; /* Adjusted spacing */
+}
+
+.skills__card-description {
+  font-size: 0.875rem; /* Consistent font size */
+  margin-bottom: 0.75rem; /* Adjusted spacing */
+}
+
+.skills__card-link1 {
+  display: inline-block;
+  padding: 0.5rem 1rem; /* Consistent padding */
+  font-size: 0.875rem; /* Consistent font size */
+  color: #e81cff;
+  background-color: #000;
+  border-radius: 0.5rem;
+  border: 2px solid #e81cff;
+  text-decoration: none;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.skills__card-link1:hover {
+  background-color: #e81cff;
+  color: #000;
+}
+
+.skills__data {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem; /* Adjusted spacing */
+  border-radius: 0.5rem;
+  box-shadow: 0px 4px 20px rgba(14, 36, 49, 0.15); /* Consistent shadow */
+}
+
+.skills__row {
+  display: flex;
+  flex-wrap: wrap; /* Allows wrapping of rows */
+  gap: 0.2rem; /* Decreased space between cards */
+  margin: 1.5rem; /* Center align rows and adjust bottom margin */
+  margin-bottom: 4rem;
+  justify-content: center; /* Center align cards */
+  max-width: 95%; /* Restrict maximum width for better alignment */
+}
+
+.skills__container {
+  flex: 1 1 calc(33.333% - 0.5rem); /* 3 cards per row with tighter margin */
+  max-width: calc(33.333% - 0.5rem); /* 3 cards per row with tighter margin */
+  display: flex;
+  justify-content: center; /* Center align individual cards */
+}
+
+@media (max-width: 768px) {
+  .skills__container {
+    flex: 1 1 calc(50% - 0.5rem); /* 2 cards per row with tighter margin */
+    max-width: calc(50% - 0.5rem); /* 2 cards per row with tighter margin */
+  }
+}
+
+@media (max-width: 480px) {
+  .skills__container {
+    flex: 1 1 calc(100% - 0.5rem); /* 1 card per row on very small screens */
+    max-width: calc(100% - 0.5rem); /* Full width on very small screens */
+  }
 }
 
 /* ===== ABOUT =====*/
