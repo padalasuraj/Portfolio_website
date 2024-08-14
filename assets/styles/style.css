@@ -445,7 +445,7 @@ img {
 
 /*  2 */
 .skills__card-link2 {
-  text-decoration: none; /* Remove default underline from the link */
+  text-decoration: none;
   color: inherit; /* Inherit text color from the parent element */
 }
 
