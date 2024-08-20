@@ -251,7 +251,9 @@
       </section>
 
 <!-- CONTACT -->
-<section class="contact section" id="contact">
+
+
+      <section class="contact section" id="contact">
   <h2 class="section-title">Contact</h2>
 
   <div class="contact__container bd-grid">
@@ -260,41 +262,54 @@
       method="post"
       data-netlify="true"
       class="contact__form"
-      onsubmit="handleFormSubmit(event)"
     >
       <input type="hidden" name="form-name" value="contact" />
       <!-- Required for Netlify form submission -->
 
-      <input
-        type="text"
-        name="name"
-        placeholder="Name"
-        class="contact__input"
-        required
-      />
-      <input
-        type="email"
-        name="email"
-        placeholder="Email"
-        class="contact__input"
-        required
-      />
-      <textarea
-        name="message"
-        placeholder="Your message"
-        class="contact__input"
-        required
-      ></textarea>
-
-      <button
-        type="submit"
-        class="contact__button button"
-      >
-        Send
-      </button>
+      <p>
+        <label>
+          Name
+          <input
+            type="text"
+            name="name"
+            placeholder="Name"
+            class="contact__input"
+            required
+          />
+        </label>
+      </p>
+      <p>
+        <label>
+          Email
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            class="contact__input"
+            required
+          />
+        </label>
+      </p>
+      <p>
+        <label>
+          Message
+          <textarea
+            name="message"
+            placeholder="Your message"
+            class="contact__input"
+            required
+          ></textarea>
+        </label>
+      </p>
+      <p>
+        <button type="submit" class="contact__button button">
+          Send
+        </button>
+      </p>
     </form>
   </div>
 </section>
+
 
 
     <!--FOOTER-->
