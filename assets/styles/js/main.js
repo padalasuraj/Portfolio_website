@@ -804,8 +804,25 @@ function showToast(message) {
 }
 
 function initContactAndResume() {
-  $("#resume-button")?.addEventListener("click", () => {
-    showToast("Resume file is not in the project yet. Add a PDF asset and I can wire this button to it.");
+  $("#resume-button")?.addEventListener("click", async (event) => {
+    const button = event.currentTarget;
+    const resumePath = button.dataset.resumePath || "assets/resume/Padala-Suraj-Resume.pdf";
+
+    try {
+      const response = await fetch(resumePath, { method: "HEAD" });
+      if (!response.ok) {
+        throw new Error("Resume asset not found");
+      }
+
+      const link = document.createElement("a");
+      link.href = resumePath;
+      link.download = "Padala-Suraj-Resume.pdf";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      showToast("Resume PDF is not in assets/resume yet. Add Padala-Suraj-Resume.pdf there and this button will download it.");
+    }
   });
 
   const form = $("#contact-form");
