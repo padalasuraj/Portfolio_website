@@ -185,6 +185,167 @@ function initStarfield() {
   window.addEventListener("beforeunload", () => cancelAnimationFrame(animationId));
 }
 
+function initSatelliteSystem() {
+  const orbitSystem = $("#orbit-system");
+
+  if (!orbitSystem) {
+    return;
+  }
+
+  const satellites = [
+    { orbit: 310, size: 28, speed: 8, start: 12, tiltX: 72, tiltY: 18, scale: 0.62, alpha: 0.7, type: "probe" },
+    { orbit: 330, size: 34, speed: 10, start: 88, tiltX: 68, tiltY: -12, scale: 0.74, alpha: 0.86, type: "panel" },
+    { orbit: 350, size: 24, speed: 7, start: 176, tiltX: 78, tiltY: 28, scale: 0.58, alpha: 0.62, type: "probe" },
+    { orbit: 382, size: 42, speed: 14, start: 244, tiltX: 64, tiltY: -30, scale: 0.82, alpha: 0.86, type: "panel" },
+    { orbit: 405, size: 30, speed: 11, start: 318, tiltX: 76, tiltY: 8, scale: 0.7, alpha: 0.66, type: "ship" },
+    { orbit: 438, size: 50, speed: 18, start: 42, tiltX: 58, tiltY: 42, scale: 0.9, alpha: 0.92, type: "panel" },
+    { orbit: 462, size: 36, speed: 16, start: 126, tiltX: 82, tiltY: -46, scale: 0.76, alpha: 0.78, type: "ship" },
+    { orbit: 488, size: 26, speed: 12, start: 206, tiltX: 15, tiltY: 74, scale: 0.64, alpha: 0.64, type: "probe" },
+    { orbit: 516, size: 54, speed: 24, start: 286, tiltX: 54, tiltY: -56, scale: 1, alpha: 0.95, type: "panel" },
+    { orbit: 540, size: 32, speed: 15, start: 354, tiltX: 22, tiltY: 82, scale: 0.72, alpha: 0.72, type: "ship" },
+    { orbit: 576, size: 62, speed: 31, start: 64, tiltX: 70, tiltY: -6, scale: 1.08, alpha: 0.9, type: "panel" },
+    { orbit: 610, size: 38, speed: 22, start: 156, tiltX: 48, tiltY: 66, scale: 0.82, alpha: 0.76, type: "probe" },
+    { orbit: 642, size: 72, speed: 38, start: 238, tiltX: 62, tiltY: -72, scale: 1.16, alpha: 0.82, type: "ship" },
+    { orbit: 676, size: 44, speed: 27, start: 326, tiltX: 84, tiltY: 22, scale: 0.88, alpha: 0.68, type: "panel" },
+  ];
+
+  const visibleSatellites = isMobile ? satellites.slice(0, 8) : satellites;
+
+  visibleSatellites.forEach((config) => {
+    const orbit = document.createElement("span");
+    const satellite = document.createElement("span");
+    orbit.className = "satellite-orbit";
+    satellite.className = `satellite satellite--${config.type}`;
+
+    orbit.style.setProperty("--orbit", `${config.orbit}px`);
+    orbit.style.setProperty("--speed", `${config.speed}s`);
+    orbit.style.setProperty("--start", `${config.start}deg`);
+    orbit.style.setProperty("--tilt-x", `${config.tiltX}deg`);
+    orbit.style.setProperty("--tilt-y", `${config.tiltY}deg`);
+    satellite.style.setProperty("--size", `${config.size}px`);
+    satellite.style.setProperty("--scale", String(config.scale));
+    satellite.style.setProperty("--alpha", String(config.alpha));
+
+    orbit.appendChild(satellite);
+    orbitSystem.appendChild(orbit);
+  });
+}
+
+function initSamuraiTransitions() {
+  const stage = $("#samurai-stage");
+
+  if (!stage || prefersReducedMotion) {
+    return;
+  }
+
+  const sections = $$(".section-panel");
+  let lastStrike = 0;
+  let lastSectionId = "home";
+
+  const strike = (section) => {
+    const now = Date.now();
+    if (now - lastStrike < 1350 || section.id === lastSectionId) {
+      return;
+    }
+
+    lastStrike = now;
+    lastSectionId = section.id;
+    section.classList.add("is-samurai-revealed");
+    stage.classList.remove("is-striking");
+    void stage.offsetWidth;
+    stage.classList.add("is-striking");
+
+    window.setTimeout(() => {
+      stage.classList.remove("is-striking");
+      section.classList.remove("is-samurai-revealed");
+    }, 1050);
+  };
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && entry.intersectionRatio > 0.44) {
+          strike(entry.target);
+        }
+      });
+    },
+    { threshold: [0.45], rootMargin: "-18% 0px -18% 0px" }
+  );
+
+  sections.forEach((section) => observer.observe(section));
+}
+
+function initSamuraiCutaways() {
+  if (prefersReducedMotion || isMobile) {
+    return;
+  }
+
+  const targets = [
+    ...$$(".orbit-panel"),
+    ...$$(".stat-chip"),
+    ...$$(".timeline-card"),
+    ...$$(".project-card"),
+  ];
+
+  const selectedTargets = targets.filter((_, index) => index % 2 === 0 || index === 3);
+
+  const addCutLayer = (target) => {
+    target.classList.add("samurai-cut-target");
+
+    const layerNames = [
+      "cut-plate",
+      "cut-shard cut-shard--top",
+      "cut-shard cut-shard--bottom",
+      "cut-flare",
+      "cut-spark",
+      "cut-spark",
+      "cut-spark",
+    ];
+
+    layerNames.forEach((className) => {
+      const element = document.createElement("span");
+      element.className = className;
+      target.appendChild(element);
+    });
+  };
+
+  selectedTargets.forEach(addCutLayer);
+
+  const triggerCut = (target) => {
+    if (target.classList.contains("is-cut-away")) {
+      return;
+    }
+
+    target.classList.add("is-cut-away");
+    window.setTimeout(() => target.classList.remove("is-cut-away"), 980);
+  };
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting || entry.intersectionRatio < 0.62) {
+          return;
+        }
+
+        const target = entry.target;
+        const delay = Number(target.dataset.cutDelay || 0);
+        window.setTimeout(() => triggerCut(target), delay);
+        observer.unobserve(target);
+      });
+    },
+    { threshold: [0.62], rootMargin: "-10% 0px -12% 0px" }
+  );
+
+  selectedTargets.forEach((target, index) => {
+    target.dataset.cutDelay = String(180 + (index % 4) * 210);
+    observer.observe(target);
+  });
+
+  $$(".orbit-panel").forEach((panel) => {
+    panel.addEventListener("pointerenter", () => triggerCut(panel));
+  });
+}
+
 async function initGlobe() {
   const canvas = $("#globe-canvas");
   const loader = $("#globe-loader");
@@ -1053,6 +1214,9 @@ initReveal();
 initCursorAndParallax();
 initMagneticButtons();
 initStarfield();
+initSatelliteSystem();
+initSamuraiTransitions();
+initSamuraiCutaways();
 initGlobe();
 initSkillConstellation();
 initProjectTilt();

@@ -17,6 +17,30 @@
   <body>
     <div class="cursor-glow" aria-hidden="true"></div>
     <canvas class="starfield" id="starfield" aria-hidden="true"></canvas>
+    <div class="void-aurora" aria-hidden="true"></div>
+    <div class="samurai-stage" id="samurai-stage" aria-hidden="true">
+      <div class="samurai-stage__veil samurai-stage__veil--top"></div>
+      <div class="samurai-stage__veil samurai-stage__veil--bottom"></div>
+      <div class="samurai-runner">
+        <span class="samurai-runner__scarf"></span>
+        <span class="samurai-runner__head"></span>
+        <span class="samurai-runner__body"></span>
+        <span class="samurai-runner__blade"></span>
+      </div>
+      <div class="slash-beam"></div>
+      <div class="slash-sparks">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+    <div class="hanging-samurai" aria-hidden="true">
+      <span class="hanging-samurai__line"></span>
+      <span class="hanging-samurai__figure"></span>
+      <span class="hanging-samurai__blade"></span>
+    </div>
 
     <header class="site-header" id="site-header">
       <nav class="nav-shell" aria-label="Primary navigation">
@@ -107,6 +131,19 @@
             <div class="globe-frame">
               <canvas id="globe-canvas" aria-label="Interactive 3D network globe"></canvas>
               <div class="globe-loader" id="globe-loader">Initializing globe</div>
+              <div class="orbit-system" id="orbit-system" aria-hidden="true">
+                <div class="orbit-ring orbit-ring--inner"></div>
+                <div class="orbit-ring orbit-ring--middle"></div>
+                <div class="orbit-ring orbit-ring--outer"></div>
+                <div class="orbit-ring orbit-ring--vertical"></div>
+                <div class="orbit-ring orbit-ring--slash"></div>
+              </div>
+            </div>
+            <div class="hero-samurai" aria-hidden="true">
+              <span class="hero-samurai__halo"></span>
+              <span class="hero-samurai__scarf"></span>
+              <span class="hero-samurai__body"></span>
+              <span class="hero-samurai__blade"></span>
             </div>
             <div class="orbit-panel orbit-panel--code" data-depth="0.16">CODE</div>
             <div class="orbit-panel orbit-panel--cloud" data-depth="0.11">CLOUD</div>
