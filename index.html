@@ -116,10 +116,21 @@
               </a>
               <a
                 href="https://www.linkedin.com/in/padala-suraj-b159b0234/"
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="LinkedIn"
               >
                 <i class="bx bxl-linkedin"></i>
                 <span>IN</span>
+              </a>
+              <a
+                href="https://www.instagram.com/suraj.padala/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+              >
+                <i class="bx bxl-instagram"></i>
+                <span>IG</span>
               </a>
               <a href="mailto:padalasuraj80@gmail.com" aria-label="Email">
                 <i class="bx bx-envelope"></i>
@@ -139,12 +150,6 @@
                 <div class="orbit-ring orbit-ring--vertical"></div>
                 <div class="orbit-ring orbit-ring--slash"></div>
               </div>
-            </div>
-            <div class="hero-samurai" aria-hidden="true">
-              <span class="hero-samurai__halo"></span>
-              <span class="hero-samurai__scarf"></span>
-              <span class="hero-samurai__body"></span>
-              <span class="hero-samurai__blade"></span>
             </div>
             <div class="orbit-panel orbit-panel--code" data-depth="0.16">CODE</div>
             <div class="orbit-panel orbit-panel--cloud" data-depth="0.11">CLOUD</div>
@@ -467,19 +472,23 @@
 
       <section class="section-panel game" id="game">
         <div class="section-heading reveal">
-          <p class="eyebrow">Take a break from scrolling.</p>
-          <h2>Cyber Runner</h2>
+          <p class="eyebrow">Neon street demo</p>
+          <h2>Vice Drive</h2>
         </div>
 
         <div class="game-shell reveal">
           <div class="game-hud">
             <div>
-              <span>Score</span>
+              <span>Distance</span>
               <strong id="game-score">0</strong>
             </div>
             <div>
-              <span>High</span>
+              <span>Best</span>
               <strong id="game-high-score">0</strong>
+            </div>
+            <div>
+              <span>Visits</span>
+              <strong id="visit-count">--</strong>
             </div>
             <button class="icon-button" id="mute-game" type="button" aria-label="Mute game sound">
               <i class="bx bx-volume-full"></i>
@@ -490,20 +499,28 @@
             id="cyber-runner"
             width="920"
             height="460"
-            aria-label="Cyber Runner playable canvas game"
+            aria-label="Vice Drive playable canvas game"
           ></canvas>
           <div class="game-overlay" id="game-overlay">
-            <h3>Cyber Runner</h3>
-            <p>Move left and right, collect energy, avoid red barriers.</p>
+            <h3>Vice Drive</h3>
+            <p>Use arrow keys or touch controls to cruise through the neon roads.</p>
             <button class="control-button magnetic" id="start-game" type="button">
               <i class="bx bx-play"></i>
-              Start Mission
+              Start Drive
             </button>
           </div>
           <div class="touch-controls" aria-label="Touch controls">
             <button class="icon-button" id="touch-left" type="button" aria-label="Move left">
               <i class="bx bx-left-arrow-alt"></i>
               <span>L</span>
+            </button>
+            <button class="icon-button" id="touch-up" type="button" aria-label="Accelerate">
+              <i class="bx bx-up-arrow-alt"></i>
+              <span>U</span>
+            </button>
+            <button class="icon-button" id="touch-down" type="button" aria-label="Brake">
+              <i class="bx bx-down-arrow-alt"></i>
+              <span>D</span>
             </button>
             <button class="icon-button" id="touch-right" type="button" aria-label="Move right">
               <i class="bx bx-right-arrow-alt"></i>
@@ -593,6 +610,10 @@
           <i class="bx bxl-linkedin"></i>
           <span>IN</span>
         </a>
+        <a href="https://www.instagram.com/suraj.padala/" aria-label="Instagram">
+          <i class="bx bxl-instagram"></i>
+          <span>IG</span>
+        </a>
         <a href="mailto:padalasuraj80@gmail.com" aria-label="Email">
           <i class="bx bx-envelope"></i>
           <span>EM</span>
@@ -600,7 +621,6 @@
       </div>
     </footer>
 
-    <script src="https://unpkg.com/scrollreveal"></script>
     <script type="module" src="assets/styles/js/main.js"></script>
   </body>
 </html>

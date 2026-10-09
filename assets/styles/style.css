@@ -42,6 +42,8 @@ body {
   color: var(--text);
   font-family: "Inter", sans-serif;
   overflow-x: hidden;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 body::before {
@@ -459,6 +461,8 @@ canvas {
   width: min(var(--max), calc(100vw - 32px));
   margin: 0 auto;
   padding: 112px 0;
+  content-visibility: auto;
+  contain-intrinsic-size: 900px;
 }
 
 .section-panel::before {
@@ -494,6 +498,7 @@ canvas {
   display: grid;
   align-items: center;
   padding-top: calc(var(--header) + 64px);
+  content-visibility: visible;
 }
 
 .hero__grid {
@@ -654,6 +659,7 @@ canvas {
   position: relative;
   min-height: 680px;
   perspective: 1200px;
+  contain: layout paint;
 }
 
 .globe-frame {
@@ -1653,6 +1659,7 @@ canvas {
   position: relative;
   overflow: hidden;
   padding: 16px;
+  touch-action: manipulation;
 }
 
 .game-hud {
@@ -1660,10 +1667,12 @@ canvas {
   align-items: center;
   gap: 12px;
   margin-bottom: 12px;
+  flex-wrap: wrap;
 }
 
 .game-hud div {
-  min-width: 110px;
+  min-width: min(110px, 30vw);
+  flex: 1 1 110px;
   padding: 10px 12px;
   border: 1px solid rgba(82, 230, 255, 0.2);
   border-radius: 6px;
@@ -1684,10 +1693,13 @@ canvas {
 
 #cyber-runner {
   width: 100%;
+  height: auto;
+  min-height: 260px;
   aspect-ratio: 2 / 1;
   border: 1px solid rgba(82, 230, 255, 0.28);
   border-radius: 6px;
   background: #02060d;
+  touch-action: none;
 }
 
 .game-overlay {
@@ -1710,6 +1722,7 @@ canvas {
 .touch-controls {
   display: none;
   justify-content: center;
+  flex-wrap: wrap;
   gap: 12px;
   margin-top: 12px;
 }
@@ -2133,7 +2146,7 @@ canvas {
   }
 
   .hero__visual {
-    min-height: 560px;
+    min-height: 500px;
   }
 
   .hero-samurai {
@@ -2187,7 +2200,7 @@ canvas {
   .section-panel,
   .hero {
     width: min(100% - 24px, var(--max));
-    padding: 82px 0;
+    padding: 76px 0;
   }
 
   .hero {
@@ -2196,7 +2209,7 @@ canvas {
   }
 
   .hero__visual {
-    min-height: 420px;
+    min-height: 390px;
   }
 
   .orbit-panel {
@@ -2277,6 +2290,19 @@ canvas {
     display: flex;
   }
 
+  .starfield,
+  .void-aurora {
+    opacity: 0.55;
+  }
+
+  body::before {
+    animation: none;
+  }
+
+  #cyber-runner {
+    aspect-ratio: 1.38 / 1;
+  }
+
   .footer {
     flex-direction: column;
     align-items: flex-start;
@@ -2302,7 +2328,7 @@ canvas {
   }
 
   .hero__visual {
-    min-height: 350px;
+    min-height: 320px;
   }
 
   .hero-samurai {
@@ -2316,6 +2342,18 @@ canvas {
 
   .game-hud {
     flex-wrap: wrap;
+  }
+
+  .game-shell {
+    padding: 10px;
+  }
+
+  .game-overlay {
+    inset: 126px 10px 10px;
+  }
+
+  .game-hud .icon-button {
+    min-width: 100%;
   }
 }
 

@@ -2,6 +2,7 @@
 
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const isMobile = window.matchMedia("(max-width: 780px)").matches;
+const isCoarsePointer = window.matchMedia("(pointer: coarse)").matches;
 const $ = (selector, scope = document) => scope.querySelector(selector);
 const $$ = (selector, scope = document) => Array.from(scope.querySelectorAll(selector));
 
@@ -75,29 +76,40 @@ function initCursorAndParallax() {
   const glow = $(".cursor-glow");
   const parallaxItems = $$("[data-depth]");
 
-  if (prefersReducedMotion) {
+  if (prefersReducedMotion || isMobile || isCoarsePointer) {
     glow?.remove();
     return;
   }
 
+  let rafId = 0;
+  let pointer = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+
+  const render = () => {
+    rafId = 0;
+    const x = pointer.x;
+    const y = pointer.y;
+    glow?.style.setProperty("transform", `translate3d(${x - 176}px, ${y - 176}px, 0)`);
+
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    const offsetX = (x - centerX) / centerX;
+    const offsetY = (y - centerY) / centerY;
+
+    parallaxItems.forEach((item) => {
+      const depth = Number(item.dataset.depth || 0.08);
+      item.style.transform = `translate3d(${offsetX * depth * 28}px, ${
+        offsetY * depth * 28
+      }px, 0)`;
+    });
+  };
+
   window.addEventListener(
     "pointermove",
     (event) => {
-      const x = event.clientX;
-      const y = event.clientY;
-      glow?.style.setProperty("transform", `translate3d(${x - 176}px, ${y - 176}px, 0)`);
-
-      const centerX = window.innerWidth / 2;
-      const centerY = window.innerHeight / 2;
-      const offsetX = (x - centerX) / centerX;
-      const offsetY = (y - centerY) / centerY;
-
-      parallaxItems.forEach((item) => {
-        const depth = Number(item.dataset.depth || 0.08);
-        item.style.transform = `translate3d(${offsetX * depth * 44}px, ${
-          offsetY * depth * 44
-        }px, 0)`;
-      });
+      pointer = { x: event.clientX, y: event.clientY };
+      if (!rafId) {
+        rafId = requestAnimationFrame(render);
+      }
     },
     { passive: true }
   );
@@ -145,7 +157,7 @@ function initStarfield() {
     canvas.style.height = `${height}px`;
     context.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    const count = isMobile ? 70 : 150;
+    const count = isMobile ? 32 : 72;
     stars = Array.from({ length: count }, () => ({
       x: Math.random() * width,
       y: Math.random() * height,
@@ -354,6 +366,10 @@ async function initGlobe() {
     return;
   }
 
+  drawFallbackGlobe(canvas, loader);
+}
+
+async function initUnusedThreeGlobe() {
   try {
     const THREE = await import("https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js");
     const scene = new THREE.Scene();
@@ -1226,16 +1242,364 @@ function initCyberRunner() {
   draw();
 }
 
+function initVisitCounter() {
+  const visitEl = $("#visit-count");
+  const storageKey = "padalaSurajPortfolioVisits";
+  const localVisits = Number(localStorage.getItem(storageKey) || 0) + 1;
+  localStorage.setItem(storageKey, String(localVisits));
+
+  if (visitEl) {
+    visitEl.textContent = String(localVisits);
+    visitEl.title = "Local visit count. Add a data-visit-endpoint to the html tag for one shared lifetime counter.";
+  }
+
+  const endpoint = document.documentElement.dataset.visitEndpoint;
+  if (!endpoint) {
+    return;
+  }
+
+  fetch(endpoint, {
+    method: "POST",
+    keepalive: true,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      path: window.location.pathname,
+      referrer: document.referrer,
+      at: new Date().toISOString(),
+    }),
+  })
+    .then((response) => (response.ok ? response.json() : null))
+    .then((data) => {
+      if (data?.count && visitEl) {
+        visitEl.textContent = String(data.count);
+        visitEl.title = "Lifetime visit count";
+      }
+    })
+    .catch(() => {});
+}
+
+function initViceDrive() {
+  const canvas = $("#cyber-runner");
+  const context = canvas?.getContext("2d");
+  const scoreEl = $("#game-score");
+  const highScoreEl = $("#game-high-score");
+  const overlay = $("#game-overlay");
+  const startButton = $("#start-game");
+  const muteButton = $("#mute-game");
+
+  if (!canvas || !context) {
+    return;
+  }
+
+  let width = 920;
+  let height = 460;
+  let running = false;
+  let animationId = 0;
+  let lastTime = 0;
+  let trafficTimer = 0;
+  let score = 0;
+  let speed = 210;
+  let roadOffset = 0;
+  let muted = localStorage.getItem("viceDriveMuted") === "true";
+  let highScore = Number(localStorage.getItem("viceDriveHighScore") || 0);
+  const keys = { left: false, right: false, up: false, down: false };
+  const player = { x: width / 2, y: height - 88, width: 54, height: 86, vx: 0 };
+  const traffic = [];
+  let audioContext = null;
+
+  highScoreEl.textContent = String(highScore);
+
+  const updateMuteIcon = () => {
+    const icon = muteButton?.querySelector("i");
+    if (icon) {
+      icon.className = muted ? "bx bx-volume-mute" : "bx bx-volume-full";
+    }
+  };
+
+  const beep = (frequency, duration = 0.06, gainValue = 0.025) => {
+    if (muted) {
+      return;
+    }
+    audioContext ||= new AudioContext();
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    oscillator.frequency.value = frequency;
+    oscillator.type = "triangle";
+    gain.gain.value = gainValue;
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+    oscillator.start();
+    oscillator.stop(audioContext.currentTime + duration);
+  };
+
+  const resizeCanvas = () => {
+    const rect = canvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.25 : 1.75);
+    width = Math.max(320, Math.floor(rect.width || 920));
+    height = Math.max(260, Math.floor(width * (isMobile ? 0.72 : 0.5)));
+    canvas.width = Math.floor(width * dpr);
+    canvas.height = Math.floor(height * dpr);
+    context.setTransform(dpr, 0, 0, dpr, 0, 0);
+    player.y = height - 88;
+    player.x = Math.max(width * 0.22, Math.min(width * 0.78, player.x || width / 2));
+  };
+
+  const roadBoundsAt = (y) => {
+    const depth = y / height;
+    const roadWidth = width * (0.18 + depth * 0.72);
+    const center = width / 2 + Math.sin((roadOffset + y) * 0.003) * width * 0.045 * depth;
+    return { left: center - roadWidth / 2, right: center + roadWidth / 2, center, roadWidth };
+  };
+
+  const intersects = (a, b) =>
+    a.x < b.x + b.width &&
+    a.x + a.width > b.x &&
+    a.y < b.y + b.height &&
+    a.y + a.height > b.y;
+
+  const spawnTraffic = () => {
+    const bounds = roadBoundsAt(height * 0.45);
+    const laneCount = 4;
+    const lane = Math.floor(Math.random() * laneCount);
+    const laneWidth = bounds.roadWidth / laneCount;
+    traffic.push({
+      x: bounds.left + laneWidth * lane + laneWidth / 2,
+      y: height * 0.24,
+      width: 34,
+      height: 58,
+      color: Math.random() > 0.5 ? "#ffd166" : "#ff4d74",
+    });
+  };
+
+  const endGame = () => {
+    running = false;
+    highScore = Math.max(highScore, Math.floor(score));
+    localStorage.setItem("viceDriveHighScore", String(highScore));
+    highScoreEl.textContent = String(highScore);
+    overlay.innerHTML = `
+      <h3>Drive Complete</h3>
+      <p>Distance ${Math.floor(score)}. Best ${highScore}.</p>
+      <button class="control-button magnetic" id="restart-game" type="button">
+        <i class="bx bx-refresh"></i>
+        Drive Again
+      </button>
+    `;
+    overlay.classList.remove("is-hidden");
+    $("#restart-game")?.addEventListener("click", reset);
+    beep(96, 0.16, 0.04);
+  };
+
+  const reset = () => {
+    running = true;
+    lastTime = performance.now();
+    trafficTimer = 0;
+    score = 0;
+    speed = 210;
+    roadOffset = 0;
+    player.x = width / 2;
+    player.y = height - 88;
+    player.vx = 0;
+    traffic.length = 0;
+    overlay?.classList.add("is-hidden");
+    scoreEl.textContent = "0";
+    beep(220);
+    cancelAnimationFrame(animationId);
+    animationId = requestAnimationFrame(loop);
+  };
+
+  const update = (delta) => {
+    trafficTimer += delta;
+    speed += ((keys.up ? 360 : keys.down ? 130 : 230) - speed) * Math.min(1, delta * 2.5);
+    score += delta * speed * 0.06;
+    roadOffset += speed * delta;
+
+    if (trafficTimer > Math.max(0.78, 1.75 - speed / 360)) {
+      trafficTimer = 0;
+      spawnTraffic();
+    }
+
+    const targetVelocity = (keys.left ? -1 : 0) + (keys.right ? 1 : 0);
+    player.vx += (targetVelocity * 480 - player.vx) * Math.min(1, delta * 11);
+    player.x += player.vx * delta;
+
+    const bounds = roadBoundsAt(player.y);
+    player.x = Math.max(bounds.left + 32, Math.min(bounds.right - 32, player.x));
+
+    traffic.forEach((car) => {
+      const carBounds = roadBoundsAt(car.y);
+      const depth = car.y / height;
+      car.y += speed * (0.58 + depth * 0.7) * delta;
+      car.x += (carBounds.center - width / 2) * delta * 0.22;
+      car.width = 30 + depth * 28;
+      car.height = 50 + depth * 54;
+    });
+
+    const playerRect = {
+      x: player.x - player.width / 2,
+      y: player.y - player.height / 2,
+      width: player.width,
+      height: player.height,
+    };
+
+    for (let i = traffic.length - 1; i >= 0; i -= 1) {
+      const car = traffic[i];
+      const carRect = {
+        x: car.x - car.width / 2,
+        y: car.y - car.height / 2,
+        width: car.width,
+        height: car.height,
+      };
+      if (intersects(playerRect, carRect)) {
+        endGame();
+        return;
+      }
+      if (car.y > height + 120) {
+        traffic.splice(i, 1);
+      }
+    }
+
+    scoreEl.textContent = String(Math.floor(score));
+  };
+
+  const drawCar = (x, y, carWidth, carHeight, color, isPlayer = false) => {
+    context.save();
+    context.translate(x, y);
+    context.shadowColor = isPlayer ? "#ff35d3" : color;
+    context.shadowBlur = isPlayer ? 18 : 10;
+    context.fillStyle = color;
+    context.beginPath();
+    context.roundRect(-carWidth / 2, -carHeight / 2, carWidth, carHeight, 8);
+    context.fill();
+    context.fillStyle = "rgba(236, 248, 255, 0.82)";
+    context.fillRect(-carWidth * 0.28, -carHeight * 0.24, carWidth * 0.56, carHeight * 0.24);
+    context.fillStyle = isPlayer ? "#52e6ff" : "#071827";
+    context.fillRect(-carWidth * 0.34, carHeight * 0.18, carWidth * 0.18, carHeight * 0.08);
+    context.fillRect(carWidth * 0.16, carHeight * 0.18, carWidth * 0.18, carHeight * 0.08);
+    context.restore();
+  };
+
+  const draw = () => {
+    context.clearRect(0, 0, width, height);
+    const gradient = context.createLinearGradient(0, 0, 0, height);
+    gradient.addColorStop(0, "#12051e");
+    gradient.addColorStop(0.48, "#071827");
+    gradient.addColorStop(1, "#02060d");
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, width, height);
+
+    context.fillStyle = "rgba(255, 53, 211, 0.2)";
+    context.fillRect(0, 0, width, height * 0.22);
+    context.fillStyle = "rgba(94, 229, 255, 0.18)";
+    for (let i = 0; i < 9; i += 1) {
+      const buildingWidth = width / 9;
+      const buildingHeight = 36 + ((i * 29) % 82);
+      context.fillRect(i * buildingWidth, height * 0.22 - buildingHeight, buildingWidth - 6, buildingHeight);
+    }
+
+    context.beginPath();
+    for (let y = height * 0.2; y <= height; y += 18) {
+      const bounds = roadBoundsAt(y);
+      if (y === height * 0.2) {
+        context.moveTo(bounds.left, y);
+      } else {
+        context.lineTo(bounds.left, y);
+      }
+    }
+    for (let y = height; y >= height * 0.2; y -= 18) {
+      const bounds = roadBoundsAt(y);
+      context.lineTo(bounds.right, y);
+    }
+    context.closePath();
+    context.fillStyle = "#151723";
+    context.fill();
+    context.strokeStyle = "rgba(82, 230, 255, 0.42)";
+    context.lineWidth = 2;
+    context.stroke();
+
+    context.strokeStyle = "rgba(255, 255, 255, 0.46)";
+    context.setLineDash([22, 22]);
+    context.lineDashOffset = -roadOffset * 0.25;
+    for (let lane = 1; lane < 4; lane += 1) {
+      context.beginPath();
+      for (let y = height * 0.25; y <= height; y += 22) {
+        const bounds = roadBoundsAt(y);
+        const x = bounds.left + (bounds.roadWidth / 4) * lane;
+        if (y === height * 0.25) {
+          context.moveTo(x, y);
+        } else {
+          context.lineTo(x, y);
+        }
+      }
+      context.stroke();
+    }
+    context.setLineDash([]);
+
+    traffic.forEach((car) => drawCar(car.x, car.y, car.width, car.height, car.color));
+    drawCar(player.x, player.y, player.width, player.height, "#0f0f16", true);
+  };
+
+  const loop = (time) => {
+    const delta = Math.min(0.034, (time - lastTime) / 1000);
+    lastTime = time;
+    if (running) {
+      update(delta);
+    }
+    draw();
+    if (running) {
+      animationId = requestAnimationFrame(loop);
+    }
+  };
+
+  const setKey = (code, value) => {
+    if (code === "ArrowLeft" || code === "KeyA") keys.left = value;
+    if (code === "ArrowRight" || code === "KeyD") keys.right = value;
+    if (code === "ArrowUp" || code === "KeyW") keys.up = value;
+    if (code === "ArrowDown" || code === "KeyS") keys.down = value;
+  };
+
+  window.addEventListener("keydown", (event) => {
+    if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.code)) {
+      event.preventDefault();
+    }
+    setKey(event.code, true);
+  });
+  window.addEventListener("keyup", (event) => setKey(event.code, false));
+
+  const bindTouch = (id, key) => {
+    const button = $(id);
+    button?.addEventListener("pointerdown", () => (keys[key] = true));
+    button?.addEventListener("pointerup", () => (keys[key] = false));
+    button?.addEventListener("pointerleave", () => (keys[key] = false));
+    button?.addEventListener("pointercancel", () => (keys[key] = false));
+  };
+
+  bindTouch("#touch-left", "left");
+  bindTouch("#touch-right", "right");
+  bindTouch("#touch-up", "up");
+  bindTouch("#touch-down", "down");
+
+  startButton?.addEventListener("click", reset);
+  muteButton?.addEventListener("click", () => {
+    muted = !muted;
+    localStorage.setItem("viceDriveMuted", String(muted));
+    updateMuteIcon();
+  });
+
+  updateMuteIcon();
+  resizeCanvas();
+  draw();
+  window.addEventListener("resize", resizeCanvas, { passive: true });
+}
+
 initNavigation();
 initReveal();
 initCursorAndParallax();
 initMagneticButtons();
 initStarfield();
 initSatelliteSystem();
-initSamuraiTransitions();
-initSamuraiCutaways();
 initGlobe();
 initSkillConstellation();
 initProjectTilt();
 initContactAndResume();
-initCyberRunner();
+initVisitCounter();
+initViceDrive();
